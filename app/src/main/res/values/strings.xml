@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Object Detection</string>
+    <string name="execute">Execute</string>
+    <string name="load_image">Load Image</string>
+    <string name="enter_player">Enter Player</string>
+    <string name="dismiss">Dismiss</string>
+</resources>
