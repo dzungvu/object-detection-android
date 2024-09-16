@@ -155,8 +155,7 @@ class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        detector.clear()
-        cameraExecutor.shutdown()
+//        detector.clear()
     }
 
     override fun onResume() {
@@ -166,6 +165,11 @@ class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
         } else {
             requestPermissionLauncher.launch(REQUIRED_PERMISSIONS)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        cameraExecutor.shutdown()
     }
 
     companion object {

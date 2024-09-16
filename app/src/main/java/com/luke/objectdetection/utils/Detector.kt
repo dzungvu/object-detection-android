@@ -3,6 +3,10 @@ package com.luke.objectdetection.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.SystemClock
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.FileUtil
@@ -87,7 +91,8 @@ class Detector(
         val processedImage = imageProcessor.process(tensorImage)
         val imageBuffer = processedImage.buffer
 
-        val output = TensorBuffer.createFixedSize(intArrayOf(1 , numChannel, numElements), OUTPUT_IMAGE_TYPE)
+        val output =
+            TensorBuffer.createFixedSize(intArrayOf(1, numChannel, numElements), OUTPUT_IMAGE_TYPE)
         interpreter?.run(imageBuffer, output.buffer)
 
 
@@ -103,7 +108,49 @@ class Detector(
         detectorListener.onDetect(bestBoxes, inferenceTime)
     }
 
-    private fun bestBox(array: FloatArray) : List<BoundingBox>? {
+
+    fun detectWithCoroutine(frame: Bitmap) {
+        CoroutineScope(Dispatchers.IO).launch {
+            interpreter ?: cancel()
+            if (tensorWidth == 0) cancel()
+            if (tensorHeight == 0) cancel()
+            if (numChannel == 0) cancel()
+            if (numElements == 0) cancel()
+
+            var inferenceTime = SystemClock.uptimeMillis()
+
+            val resizedBitmap = Bitmap.createScaledBitmap(frame, tensorWidth, tensorHeight, false)
+
+            val tensorImage = TensorImage(DataType.FLOAT32)
+            tensorImage.load(resizedBitmap)
+            val processedImage = imageProcessor.process(tensorImage)
+            val imageBuffer = processedImage.buffer
+
+            val output = TensorBuffer.createFixedSize(
+                intArrayOf(1, numChannel, numElements),
+                OUTPUT_IMAGE_TYPE
+            )
+            interpreter?.run(imageBuffer, output.buffer)
+
+
+            val bestBoxes = bestBox(output.floatArray)
+            inferenceTime = SystemClock.uptimeMillis() - inferenceTime
+
+
+            if (bestBoxes == null) {
+                launch(Dispatchers.Main) {
+                    detectorListener.onEmptyDetect()
+                }
+            } else {
+                launch(Dispatchers.Main) {
+                    detectorListener.onDetect(bestBoxes, inferenceTime)
+                }
+            }
+        }
+
+    }
+
+    private fun bestBox(array: FloatArray): List<BoundingBox>? {
 
         val boundingBoxes = mutableListOf<BoundingBox>()
 
@@ -112,7 +159,7 @@ class Detector(
             var maxIdx = -1
             var j = 4
             var arrayIdx = c + numElements * j
-            while (j < numChannel){
+            while (j < numChannel) {
                 if (array[arrayIdx] > maxConf) {
                     maxConf = array[arrayIdx]
                     maxIdx = j - 4
@@ -127,10 +174,10 @@ class Detector(
                 val cy = array[c + numElements] // 1
                 val w = array[c + numElements * 2]
                 val h = array[c + numElements * 3]
-                val x1 = cx - (w/2F)
-                val y1 = cy - (h/2F)
-                val x2 = cx + (w/2F)
-                val y2 = cy + (h/2F)
+                val x1 = cx - (w / 2F)
+                val y1 = cy - (h / 2F)
+                val x2 = cx + (w / 2F)
+                val y2 = cy + (h / 2F)
                 if (x1 < 0F || x1 > 1F) continue
                 if (y1 < 0F || y1 > 1F) continue
                 if (x2 < 0F || x2 > 1F) continue
@@ -151,11 +198,11 @@ class Detector(
         return applyNMS(boundingBoxes)
     }
 
-    private fun applyNMS(boxes: List<BoundingBox>) : MutableList<BoundingBox> {
+    private fun applyNMS(boxes: List<BoundingBox>): MutableList<BoundingBox> {
         val sortedBoxes = boxes.sortedByDescending { it.cnf }.toMutableList()
         val selectedBoxes = mutableListOf<BoundingBox>()
 
-        while(sortedBoxes.isNotEmpty()) {
+        while (sortedBoxes.isNotEmpty()) {
             val first = sortedBoxes.first()
             selectedBoxes.add(first)
             sortedBoxes.remove(first)

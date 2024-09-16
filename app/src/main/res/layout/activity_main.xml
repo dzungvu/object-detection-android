@@ -31,5 +31,14 @@
         android:layout_marginTop="32dp"
         android:text="Player View" />
 
+    <Button
+        android:id="@+id/bt_player_realtime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:text="Player realtime" />
+
+
 
 </LinearLayout>

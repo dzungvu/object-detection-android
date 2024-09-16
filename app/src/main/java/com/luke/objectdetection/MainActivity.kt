@@ -38,6 +38,10 @@ class MainActivity : AppCompatActivity() {
         binding.btPlayerView.setOnClickListener {
             startActivity(Intent(this, PlayerActivity::class.java))
         }
+
+        binding.btPlayerRealtime.setOnClickListener {
+            startActivity(Intent(this, PlayerRealtimeActivity::class.java))
+        }
     }
 
 
