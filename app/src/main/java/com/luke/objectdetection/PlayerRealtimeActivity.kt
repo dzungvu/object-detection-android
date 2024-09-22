@@ -155,8 +155,8 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener, O
     }
 
     private fun detectFrame() {
-        Log.d("PlayerRealtimeActivity", "detectFrame")
         if (exoPlayer.isPlaying) {
+            Log.d("PlayerRealtimeActivity", "detectFrame")
             captureFrame()?.let { bitmap: Bitmap ->
                 Log.d("PlayerRealtimeActivity", "detectFrame: $bitmap")
                 detector.detectWithCoroutine(bitmap)
@@ -185,7 +185,7 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener, O
         val bitmap = captureFrame()
         val cropArea = cropArea(box, bitmap)
         cropArea?.let {
-            val dialog = CroppedObjectDialog.newInstance(it)
+            val dialog = CroppedObjectDialog.newInstance(it, box.clsName)
             dialog.show(supportFragmentManager, "ObjectDetectionDialog")
         }
     }

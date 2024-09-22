@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.secretGradlePlugin)
 }
 
 android {
@@ -36,6 +37,7 @@ android {
     buildFeatures {
         mlModelBinding = true
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -67,4 +69,13 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
+
+    //google gemini
+//    implementation(libs.google.api.client)
+//    implementation(libs.google.http.client.gson)
+//    implementation (libs.okhttp)
+//    implementation (libs.logging.interceptor)
+    implementation(libs.generativeai)
+
+
 }
