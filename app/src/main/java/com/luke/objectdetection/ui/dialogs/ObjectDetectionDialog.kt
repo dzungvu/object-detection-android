@@ -1,6 +1,5 @@
 package com.luke.objectdetection.ui.dialogs
 
-import android.app.Dialog
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -17,7 +16,16 @@ import com.luke.objectdetection.utils.Constants.LABELS_PATH
 import com.luke.objectdetection.utils.Constants.MODEL_PATH
 import com.luke.objectdetection.utils.Detector
 
-class ObjectDetectionDialog: DialogFragment(), Detector.DetectorListener {
+class ObjectDetectionDialog : DialogFragment(), Detector.DetectorListener {
+
+    companion object {
+        fun newInstance(bitmap: Bitmap): ObjectDetectionDialog {
+            return ObjectDetectionDialog().apply {
+                setBitmap(bitmap)
+            }
+        }
+    }
+
     private var _binding: DialogFragmentObjectDetectionBinding? = null
     private val binding get() = _binding!!
 

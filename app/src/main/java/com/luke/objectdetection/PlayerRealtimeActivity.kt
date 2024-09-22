@@ -17,16 +17,19 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.luke.objectdetection.databinding.ActivityPlayerRealtimeBinding
+import com.luke.objectdetection.ui.dialogs.CroppedObjectDialog
+import com.luke.objectdetection.ui.dialogs.ObjectDetectionDialog
 import com.luke.objectdetection.utils.BoundingBox
 import com.luke.objectdetection.utils.Constants.LABELS_PATH
 import com.luke.objectdetection.utils.Constants.MODEL_PATH
 import com.luke.objectdetection.utils.Detector
+import com.luke.objectdetection.utils.OverlayView
 import java.util.TimerTask
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
-class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener {
+class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener, OverlayView.OnChooseBoxListener {
 
     private lateinit var binding: ActivityPlayerRealtimeBinding
 
@@ -103,8 +106,10 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener {
             exoPlayer.seekForward()
         }
 
+        binding.overlay.setOnChooseBoxListener(this)
+
         val hlsUrl =
-            "https://vod03-cdn.fptplay.net/POVOD/encoded/2024/08/15/clubfridayseason16neverwrong-2024-th-001-1723701116/H264/master.m3u8?st=-JKLeMhnZlKPDi0uz_DTuw&expires=1726406014"
+            "https://vod06-cdn.fptplay.net/POVOD/encoded/2024/01/08/radioromance-2018-kr-001-1704702567/master.m3u8?st=H1mgSgOHdnRhVkOIwDHAPA&expires=1726938540"
         val mediaItem = MediaItem.fromUri(hlsUrl)
         exoPlayer.setMediaItem(mediaItem)
         exoPlayer.prepare()
@@ -139,7 +144,7 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener {
     private val frameCaptureRunnable = object : Runnable {
         override fun run() {
             detectFrame()
-            handler.postDelayed(this, 1000) // Schedule next execution in 1 second
+            handler.postDelayed(this, 500) // Schedule next execution in 1 second
         }
     }
     private var isRunningDetection = false
@@ -174,6 +179,26 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener {
                 invalidate()
             }
         }
+    }
+
+    override fun onChooseBox(box: BoundingBox) {
+        val bitmap = captureFrame()
+        val cropArea = cropArea(box, bitmap)
+        cropArea?.let {
+            val dialog = CroppedObjectDialog.newInstance(it)
+            dialog.show(supportFragmentManager, "ObjectDetectionDialog")
+        }
+    }
+
+    private fun cropArea(box: BoundingBox, bitmap: Bitmap?): Bitmap? {
+        bitmap?.let {
+            val left = box.x1 * it.width
+            val top = box.y1 * it.height
+            val right = box.x2 * it.width
+            val bottom = box.y2 * it.height
+            return Bitmap.createBitmap(it, left.toInt(), top.toInt(), right.toInt() - left.toInt(), bottom.toInt() - top.toInt())
+        }
+        return null
     }
 
     override fun onDestroy() {
