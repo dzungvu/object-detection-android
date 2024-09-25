@@ -73,9 +73,19 @@ dependencies {
     //google gemini
 //    implementation(libs.google.api.client)
 //    implementation(libs.google.http.client.gson)
-//    implementation (libs.okhttp)
-//    implementation (libs.logging.interceptor)
+
     implementation(libs.generativeai)
+
+    //network
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
+    //log network
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+
+    //image
+    implementation(libs.glide)
 
 
 }
