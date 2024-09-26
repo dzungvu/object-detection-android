@@ -1,5 +1,6 @@
 package com.luke.objectdetection.ui.dialogs
 
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -9,7 +10,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.constraintlayout.widget.Guideline
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.luke.objectdetection.R
@@ -20,6 +25,10 @@ import com.luke.objectdetection.network.RetrofitClient
 import com.luke.objectdetection.ui.adapter.SearchResultAdapter
 import com.luke.objectdetection.utils.GeminiHelper
 import com.luke.objectdetection.utils.RecyclerItemClickListener
+import com.luke.objectdetection.utils.SearchItemAnimator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -97,8 +106,71 @@ class CroppedObjectDialog : DialogFragment(), GeminiHelper.GeminiListener {
     }
 
     override fun onGeminiResponse(labels: List<String>) {
-        Log.d("CroppedObjectDialog", "onGeminiResponse: $labels")
-        searchProductBaseOnGemini(labels)
+        if (labels.isNotEmpty()) {
+            val label = labels[0]
+            Log.d("CroppedObjectDialog", "label: $label")
+            label.replace("[", "").replace("]", "").let {
+                Log.d("CroppedObjectDialog", "new label: $it")
+                searchProductBaseOnGemini(it)
+                animateTextLetterByLetter(it)
+            }
+        }
+    }
+
+    //region animate view
+    private fun animateObjectView() {
+        animateGuideline(binding.glImage, binding.root)
+    }
+
+    private fun animateGuideline(guideline: Guideline, parent: ConstraintLayout) {
+        val startPercent = 0.3f
+        val endPercent = 0.2f
+        val duration = 300L
+
+        val animator = ValueAnimator.ofFloat(startPercent, endPercent).apply {
+            this.duration = duration
+            addUpdateListener { animation ->
+                val animatedValue = animation.animatedValue as Float
+                val constraintSet = ConstraintSet()
+                constraintSet.clone(parent)
+                constraintSet.setGuidelinePercent(guideline.id, animatedValue)
+                constraintSet.applyTo(parent)
+            }
+        }
+        animator.start()
+    }
+
+//    private fun pushImageViewUpToShowTextView() {
+//        val startPercent = 0.5f
+//        val endPercent = 0.3f
+//        val duration = 300L
+//
+//        val animator = ValueAnimator.ofFloat(startPercent, endPercent).apply {
+//            this.duration = duration
+//            addUpdateListener { animation ->
+//                val animatedValue = animation.animatedValue as Float
+//                val constraintSet = ConstraintSet()
+//                constraintSet.clone(binding.root)
+//                constraintSet.setGuidelinePercent(binding.glImage, animatedValue)
+//                constraintSet.applyTo(binding.root)
+//            }
+//        }
+//        animator.start()
+//    }
+
+    private fun animateTextLetterByLetter(text: String) {
+        val duration = 100L
+        val textLength = text.length
+        val stringBuilder = StringBuilder()
+        lifecycleScope.launch(Dispatchers.IO) {
+            for (i in 0 until textLength) {
+                stringBuilder.append(text[i])
+                launch(Dispatchers.Main) {
+                    binding.tvLabel.text = stringBuilder.toString()
+                }
+                delay(duration)
+            }
+        }
     }
 
     fun setObjectBitmap(bitmap: Bitmap) {
@@ -119,6 +191,7 @@ class CroppedObjectDialog : DialogFragment(), GeminiHelper.GeminiListener {
         binding.rvSearchResult.apply {
             adapter = searchAdapter
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+            itemAnimator = SearchItemAnimator()
         }
     }
 
@@ -141,33 +214,34 @@ class CroppedObjectDialog : DialogFragment(), GeminiHelper.GeminiListener {
         }
     }
 
-    private fun searchProductBaseOnGemini(labels: List<String>) {
-        if (labels.isNotEmpty()) {
-            val query = labels[0]
-            apiService.search(query).enqueue(object : Callback<SearchResponse> {
-                override fun onResponse(
-                    call: Call<SearchResponse>,
-                    response: Response<SearchResponse>
-                ) {
-                    hideLoading()
-                    if (response.isSuccessful) {
-                        val responseBody = response.body()
-                        Log.d("YourActivity", "Response: $responseBody")
-                        searchAdapter.updateSearchResults(responseBody?.results ?: emptyList())
-                    } else {
-                        Log.e("YourActivity", "Request failed with code: ${response.code()}")
-                        Toast.makeText(
-                            context,
-                            "Request failed with code: ${response.code()}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+    //region calling api
+    private fun searchProductBaseOnGemini(query: String) {
+        apiService.search(query).enqueue(object : Callback<SearchResponse> {
+            override fun onResponse(
+                call: Call<SearchResponse>,
+                response: Response<SearchResponse>
+            ) {
+                hideLoading()
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    Log.d("YourActivity", "Response: $responseBody")
+                    searchAdapter.updateSearchResults(responseBody?.results ?: emptyList())
+                    animateObjectView()
 
-                override fun onFailure(call: Call<SearchResponse>, t: Throwable) {
-                    Log.e("YourActivity", "Request failed: ${t.message}")
+                } else {
+                    Log.e("YourActivity", "Request failed with code: ${response.code()}")
+                    Toast.makeText(
+                        context,
+                        "Request failed with code: ${response.code()}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-            })
-        }
+            }
+
+            override fun onFailure(call: Call<SearchResponse>, t: Throwable) {
+                Log.e("YourActivity", "Request failed: ${t.message}")
+            }
+        })
+
     }
 }
