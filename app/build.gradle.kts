@@ -52,12 +52,17 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    //region media3
-    implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.androidx.media3.ui)
-    //support hls
-    // Other dependencies
-    implementation(libs.androidx.media3.exoplayer.hls)
+//    //region media3
+//    implementation(libs.androidx.media3.exoplayer)
+//    implementation(libs.androidx.media3.ui)
+//    //support hls
+//    // Other dependencies
+//    implementation(libs.androidx.media3.exoplayer.hls)
+
+    //region exoplayer 2
+    implementation(libs.exoplayer)
+    implementation(libs.exoplayer.hls)
+    implementation(libs.exoplayer.ui)
 
     //region tensorflow lite
 //    implementation (libs.tensorflow.lite)

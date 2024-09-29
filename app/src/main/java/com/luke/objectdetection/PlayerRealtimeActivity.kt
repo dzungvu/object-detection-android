@@ -1,44 +1,36 @@
 package com.luke.objectdetection
 
 import android.graphics.Bitmap
-import android.graphics.SurfaceTexture
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.Surface
 import android.view.TextureView
+import android.view.View
 import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
-import androidx.media3.exoplayer.ExoPlayer
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
 import com.luke.objectdetection.databinding.ActivityPlayerRealtimeBinding
 import com.luke.objectdetection.ui.dialogs.CroppedObjectDialog
-import com.luke.objectdetection.ui.dialogs.ObjectDetectionDialog
 import com.luke.objectdetection.utils.BoundingBox
 import com.luke.objectdetection.utils.Constants.LABELS_PATH
 import com.luke.objectdetection.utils.Constants.MODEL_PATH
 import com.luke.objectdetection.utils.Detector
 import com.luke.objectdetection.utils.OverlayView
-import java.util.TimerTask
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
 
-class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener, OverlayView.OnChooseBoxListener {
+class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener,
+    OverlayView.OnChooseBoxListener {
 
     private lateinit var binding: ActivityPlayerRealtimeBinding
 
     private lateinit var detector: Detector
-    private val exoPlayer by lazy { buildPlayer() }
 
-    private val scheduledExecutorService: ScheduledExecutorService by lazy {
-        Executors.newScheduledThreadPool(1)
-    }
+    private val exoPlayer by lazy { buildPlayer() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,63 +51,6 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener, O
         bindComponent()
     }
 
-    private fun bindComponent() {
-        binding.textureView.apply {
-            surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-                override fun onSurfaceTextureAvailable(
-                    surface: SurfaceTexture,
-                    width: Int,
-                    height: Int
-                ) {
-                    exoPlayer.setVideoSurface(Surface(surface))
-                }
-
-                override fun onSurfaceTextureSizeChanged(
-                    surface: SurfaceTexture,
-                    width: Int,
-                    height: Int
-                ) {
-                }
-
-                override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-                    return false
-                }
-
-                override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
-                }
-            }
-        }
-//        binding.vPlayer.apply {
-//            player = exoPlayer
-//        }
-
-        binding.btnPlayPause.setOnClickListener {
-
-            if (exoPlayer.isPlaying) {
-                exoPlayer.pause()
-            } else {
-                exoPlayer.play()
-            }
-        }
-
-        binding.btnSeekBackward.setOnClickListener {
-            exoPlayer.seekBack()
-        }
-
-        binding.btnSeekForward.setOnClickListener {
-            exoPlayer.seekForward()
-        }
-
-        binding.overlay.setOnChooseBoxListener(this)
-
-        val hlsUrl =
-            "https://vod06-cdn.fptplay.net/POVOD/encoded/2024/01/08/radioromance-2018-kr-001-1704702567/master.m3u8?st=H1mgSgOHdnRhVkOIwDHAPA&expires=1726938540"
-        val mediaItem = MediaItem.fromUri(hlsUrl)
-        exoPlayer.setMediaItem(mediaItem)
-        exoPlayer.prepare()
-        exoPlayer.playWhenReady = true
-    }
-
     override fun onStart() {
         super.onStart()
         window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -125,17 +60,45 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener, O
         return ExoPlayer.Builder(this).build().apply {
             addListener(object : Player.Listener {
                 override fun onRenderedFirstFrame() {
-                    if(!isRunningDetection) {
+                    if (!isRunningDetection) {
                         startIntervalFrameCapture()
                     }
                 }
+
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    if (!isPlaying) {
+                        detectFrameOnPause()
+                    } else {
+                        binding.grOverlay.visibility = View.GONE
+                    }
+                }
             })
+
+
         }
     }
 
+    private fun bindComponent() {
+        binding.vPlayer.apply {
+            player = exoPlayer
+        }
+
+        binding.overlay.setOnChooseBoxListener(this)
+        binding.ivClose.setOnClickListener {
+            binding.grOverlay.visibility = View.GONE
+        }
+
+        val hlsUrl =
+            "https://vod06-cdn.fptplay.net/POVOD/encoded/2024/01/08/radioromance-2018-kr-001-1704702567/master.m3u8?st=H1mgSgOHdnRhVkOIwDHAPA&expires=1726938540"
+        val mediaItem = MediaItem.fromUri(hlsUrl)
+        exoPlayer.setMediaItem(mediaItem)
+        exoPlayer.prepare()
+        exoPlayer.playWhenReady = true
+    }
+
     private fun captureFrame(): Bitmap? {
-        binding.textureView.bitmap?.let { bitmap: Bitmap ->
-            return bitmap
+        if (binding.vPlayer.videoSurfaceView is TextureView) {
+            return (binding.vPlayer.videoSurfaceView as TextureView).bitmap
         }
         return null
     }
@@ -150,8 +113,17 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener, O
     private var isRunningDetection = false
 
     private fun startIntervalFrameCapture() {
-        isRunningDetection = true
-        handler.post(frameCaptureRunnable)
+//        isRunningDetection = true
+//        handler.post(frameCaptureRunnable)
+    }
+
+    private fun detectFrameOnPause() {
+        Log.d("PlayerRealtimeActivity", "detectFrame")
+        captureFrame()?.let { bitmap: Bitmap ->
+            Log.d("PlayerRealtimeActivity", "detectFrame: $bitmap")
+            binding.grOverlay.visibility = View.VISIBLE
+            detector.detectWithCoroutine(bitmap)
+        }
     }
 
     private fun detectFrame() {
@@ -196,7 +168,13 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener, O
             val top = box.y1 * it.height
             val right = box.x2 * it.width
             val bottom = box.y2 * it.height
-            return Bitmap.createBitmap(it, left.toInt(), top.toInt(), right.toInt() - left.toInt(), bottom.toInt() - top.toInt())
+            return Bitmap.createBitmap(
+                it,
+                left.toInt(),
+                top.toInt(),
+                right.toInt() - left.toInt(),
+                bottom.toInt() - top.toInt()
+            )
         }
         return null
     }

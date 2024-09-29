@@ -7,13 +7,11 @@
     android:layout_height="match_parent"
     tools:context=".PlayerRealtimeActivity">
 
-    <TextureView
-        android:id="@+id/texture_view"
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/v_player"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="16:9"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        app:surface_type="texture_view" />
 
     <com.luke.objectdetection.utils.OverlayView
         android:id="@+id/overlay"
@@ -21,8 +19,25 @@
         android:layout_height="0dp"
         android:clickable="true"
         android:focusable="true"
-        app:layout_constraintBottom_toBottomOf="@id/texture_view"
-        app:layout_constraintTop_toTopOf="@id/texture_view" />
+        app:layout_constraintBottom_toBottomOf="@id/v_player"
+        app:layout_constraintTop_toTopOf="@id/v_player" />
+
+    <ImageView
+        android:id="@+id/iv_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="16dp"
+        android:src="@drawable/ic_close"
+        app:layout_constraintEnd_toEndOf="@id/overlay"
+        app:layout_constraintTop_toTopOf="@id/overlay" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/gr_overlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="overlay, iv_close" />
 
     <Button
         android:id="@+id/btn_play_pause"
@@ -33,6 +48,7 @@
         android:focusable="true"
         android:text="Play/Pause"
         android:translationZ="10dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -46,6 +62,7 @@
         android:focusable="true"
         android:text="Seek Backward"
         android:translationZ="10dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/btn_play_pause"
         app:layout_constraintEnd_toStartOf="@id/btn_play_pause" />
 
@@ -58,14 +75,9 @@
         android:focusable="true"
         android:text="Seek Forward"
         android:translationZ="10dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/btn_play_pause"
         app:layout_constraintStart_toEndOf="@id/btn_play_pause" />
-
-    <androidx.media3.ui.PlayerView
-        android:id="@+id/v_player"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
 
     <TextView
         android:id="@+id/tv_test"
