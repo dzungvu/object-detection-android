@@ -109,18 +109,41 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     }
 
     private fun handleClick(x: Float, y: Float) {
-        results.forEach { box ->
+        val clickedBoxes = results.filter { box ->
             val left = box.x1 * width
             val right = box.x2 * width
             val top = box.y1 * height
             val bottom = box.y2 * height
+            x in left..right && y in top..bottom
+        }
 
-            if (x in left..right && y in top .. bottom) {
-                Log.d("OverlayView", "Clicked on ${box.clsName}")
-                onChooseBoxListener?.onChooseBox(box)
-                return
+        if (clickedBoxes.isNotEmpty()) {
+            var boxWidth = Float.MAX_VALUE
+            var boxHeight = Float.MAX_VALUE
+            var selectedBox: BoundingBox? = null
+            clickedBoxes.forEach { box ->
+                calculateWidthHeightOfSelectedBox(box).apply {
+                    if(boxWidth > first && boxHeight > second) {
+                        boxWidth = first
+                        boxHeight = second
+                        selectedBox = box
+                    }
+                }
+            }
+            if(selectedBox == null) selectedBox = clickedBoxes.last()
+            selectedBox?.let {
+                Log.d("OverlayView", "Clicked on ${it.clsName}")
+                onChooseBoxListener?.onChooseBox(it)
             }
         }
+    }
+
+    private fun calculateWidthHeightOfSelectedBox(box: BoundingBox): Pair<Float, Float> {
+        val left = box.x1 * width
+        val right = box.x2 * width
+        val top = box.y1 * height
+        val bottom = box.y2 * height
+        return Pair(right - left, bottom - top)
     }
 
     fun setResults(boundingBoxes: List<BoundingBox>) {
