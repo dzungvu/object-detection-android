@@ -8,6 +8,8 @@ import android.util.Log
 import android.view.TextureView
 import android.view.View
 import android.view.WindowManager
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -31,6 +33,7 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener,
     private lateinit var detector: Detector
 
     private val exoPlayer by lazy { buildPlayer() }
+    private var isPauseByUser = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +50,17 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener,
 
         detector = Detector(baseContext, MODEL_PATH, LABELS_PATH, this)
         detector.setup()
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if(binding.grOverlay.visibility == View.VISIBLE) {
+                    binding.grOverlay.visibility = View.GONE
+                } else {
+                    isEnabled = false
+                    onBackPressed()
+                }
+            }
+        })
 
         bindComponent()
     }
@@ -66,10 +80,11 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener,
                 }
 
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    if (!isPlaying) {
+                    if (!isPlaying && isPauseByUser) {
                         detectFrameOnPause()
                     } else {
                         binding.grOverlay.visibility = View.GONE
+                        isPauseByUser = false
                     }
                 }
             })
@@ -86,6 +101,12 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener,
         binding.overlay.setOnChooseBoxListener(this)
         binding.ivClose.setOnClickListener {
             binding.grOverlay.visibility = View.GONE
+        }
+
+        val viewPlayPause = binding.root.findViewById<View>(R.id.exo_pause)
+        viewPlayPause?.setOnClickListener {
+            isPauseByUser = true
+            exoPlayer.pause()
         }
 
         val hlsUrl =
@@ -177,6 +198,10 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener,
             )
         }
         return null
+    }
+
+    override fun getOnBackInvokedDispatcher(): OnBackInvokedDispatcher {
+        return super.getOnBackInvokedDispatcher()
     }
 
     override fun onDestroy() {

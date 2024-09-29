@@ -10,7 +10,9 @@
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/v_player"
         android:layout_width="match_parent"
+        app:auto_show="true"
         android:layout_height="match_parent"
+        app:controller_layout_id="@layout/player_controller"
         app:surface_type="texture_view" />
 
     <com.luke.objectdetection.utils.OverlayView
@@ -26,6 +28,7 @@
         android:id="@+id/iv_close"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="#4DFFFFFF"
         android:clickable="true"
         android:focusable="true"
         android:padding="16dp"
@@ -38,46 +41,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="overlay, iv_close" />
-
-    <Button
-        android:id="@+id/btn_play_pause"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:text="Play/Pause"
-        android:translationZ="10dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/btn_seek_backward"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:text="Seek Backward"
-        android:translationZ="10dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/btn_play_pause"
-        app:layout_constraintEnd_toStartOf="@id/btn_play_pause" />
-
-    <Button
-        android:id="@+id/btn_seek_forward"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:text="Seek Forward"
-        android:translationZ="10dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/btn_play_pause"
-        app:layout_constraintStart_toEndOf="@id/btn_play_pause" />
 
     <TextView
         android:id="@+id/tv_test"
@@ -97,6 +60,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="100ms" />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
