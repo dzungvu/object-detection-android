@@ -11,10 +11,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.luke.objectdetection.R
 import com.luke.objectdetection.databinding.DialogFragmentObjectDetectionBinding
-import com.luke.objectdetection.utils.BoundingBox
-import com.luke.objectdetection.utils.Constants.LABELS_PATH
-import com.luke.objectdetection.utils.Constants.MODEL_PATH
-import com.luke.objectdetection.utils.Detector
+import com.luke.object_detection.Detector
+import com.luke.object_detection.utils.BoundingBox
+import com.luke.object_detection.utils.Constants.LABELS_PATH
+import com.luke.object_detection.utils.Constants.MODEL_PATH
+import com.luke.object_detection.utils.OverlayView
 
 class ObjectDetectionDialog : DialogFragment(), Detector.DetectorListener {
 

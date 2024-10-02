@@ -1,8 +1,11 @@
-package com.luke.objectdetection.utils
+package com.luke.object_detection
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.SystemClock
+import com.luke.object_detection.utils.BoundingBox
+import com.luke.object_detection.utils.Constants.LABELS_PATH
+import com.luke.object_detection.utils.Constants.MODEL_PATH
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -22,10 +25,10 @@ import java.io.InputStreamReader
 
 class Detector(
     private val context: Context,
-    private val modelPath: String,
-    private val labelPath: String,
     private val detectorListener: DetectorListener
 ) {
+    private val modelPath: String = MODEL_PATH
+    private val labelPath: String = LABELS_PATH
     private var interpreter: Interpreter? = null
     private var labels = mutableListOf<String>()
 

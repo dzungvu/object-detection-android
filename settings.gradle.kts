@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Object Detection"
 include(":app")
- 
+include(":object-detection")

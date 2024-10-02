@@ -1,4 +1,4 @@
-package com.luke.objectdetection.utils
+package com.luke.object_detection.utils
 
 object Constants {
     const val MODEL_PATH = "model.tflite"

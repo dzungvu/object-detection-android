@@ -1,4 +1,4 @@
-package com.luke.objectdetection.utils
+package com.luke.object_detection.utils
 
 import android.content.Context
 import android.graphics.Canvas
@@ -10,7 +10,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
-import com.luke.objectdetection.R
+import com.luke.object_detection.R
 import kotlin.math.abs
 
 class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {

@@ -1,4 +1,4 @@
-package com.luke.objectdetection.utils
+package com.luke.object_detection.utils
 
 data class BoundingBox(
     val x1: Float,

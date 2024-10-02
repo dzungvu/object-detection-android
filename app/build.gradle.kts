@@ -59,16 +59,13 @@ dependencies {
 //    // Other dependencies
 //    implementation(libs.androidx.media3.exoplayer.hls)
 
+    implementation(project(":object-detection"))
+
     //region exoplayer 2
     implementation(libs.exoplayer)
     implementation(libs.exoplayer.hls)
     implementation(libs.exoplayer.ui)
 
-    //region tensorflow lite
-//    implementation (libs.tensorflow.lite)
-    implementation(libs.tensorflow.lite.gpu)
-    implementation(libs.tensorflow.lite.support)
-    implementation(libs.tensorflow.lite.metadata)
 
     //region camera
     implementation(libs.androidx.camera.camera2)

@@ -58,3 +58,4 @@ tensorflow-lite-metadata = { group = "org.tensorflow", name = "tensorflow-lite-m
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 secretGradlePlugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretGradlePlugin" }
+android-library = { id = "com.android.library", version.ref = "agp" }

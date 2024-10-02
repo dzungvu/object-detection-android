@@ -15,7 +15,7 @@
         app:layout_constraintBottom_toTopOf="@id/bt_confirm"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.luke.objectdetection.utils.OverlayView
+    <com.luke.object_detection.utils.OverlayView
         android:id="@+id/overlay"
         android:layout_width="0dp"
         android:layout_height="0dp"

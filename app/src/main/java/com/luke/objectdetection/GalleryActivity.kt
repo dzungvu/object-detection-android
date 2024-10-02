@@ -13,10 +13,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.luke.objectdetection.databinding.ActivityGalleryBinding
-import com.luke.objectdetection.utils.BoundingBox
-import com.luke.objectdetection.utils.Constants.LABELS_PATH
-import com.luke.objectdetection.utils.Constants.MODEL_PATH
-import com.luke.objectdetection.utils.Detector
+import com.luke.object_detection.Detector
+import com.luke.object_detection.utils.BoundingBox
+import com.luke.object_detection.utils.Constants.LABELS_PATH
+import com.luke.object_detection.utils.Constants.MODEL_PATH
+import com.luke.object_detection.utils.OverlayView
 
 class GalleryActivity : AppCompatActivity(), Detector.DetectorListener {
 

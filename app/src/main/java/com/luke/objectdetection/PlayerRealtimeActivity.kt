@@ -17,13 +17,13 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
+import com.luke.object_detection.Detector
+import com.luke.object_detection.utils.BoundingBox
+import com.luke.object_detection.utils.Constants.LABELS_PATH
+import com.luke.object_detection.utils.Constants.MODEL_PATH
+import com.luke.object_detection.utils.OverlayView
 import com.luke.objectdetection.databinding.ActivityPlayerRealtimeBinding
 import com.luke.objectdetection.ui.dialogs.CroppedObjectDialog
-import com.luke.objectdetection.utils.BoundingBox
-import com.luke.objectdetection.utils.Constants.LABELS_PATH
-import com.luke.objectdetection.utils.Constants.MODEL_PATH
-import com.luke.objectdetection.utils.Detector
-import com.luke.objectdetection.utils.OverlayView
 
 class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener,
     OverlayView.OnChooseBoxListener {
@@ -48,7 +48,7 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener,
             insets
         }
 
-        detector = Detector(baseContext, MODEL_PATH, LABELS_PATH, this)
+        detector = Detector(baseContext, this)
         detector.setup()
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
