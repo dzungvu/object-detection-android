@@ -37,9 +37,7 @@ class ObjectDetectionDialog : DialogFragment(), Detector.DetectorListener {
 
     //region detector
     private val detector: Detector by lazy {
-        Detector(this.requireContext(), MODEL_PATH, LABELS_PATH, this).apply {
-            setup()
-        }
+        Detector(this.requireContext(), this)
     }
 
 

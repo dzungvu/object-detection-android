@@ -30,7 +30,7 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener,
 
     private lateinit var binding: ActivityPlayerRealtimeBinding
 
-    private lateinit var detector: Detector
+    private val detector by lazy { Detector(baseContext, this) }
 
     private val exoPlayer by lazy { buildPlayer() }
     private var isPauseByUser = false
@@ -48,8 +48,7 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener,
             insets
         }
 
-        detector = Detector(baseContext, this)
-        detector.setup()
+//        detector.setup()
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {

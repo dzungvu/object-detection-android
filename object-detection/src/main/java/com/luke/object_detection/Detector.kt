@@ -42,7 +42,11 @@ class Detector(
         .add(CastOp(INPUT_IMAGE_TYPE))
         .build()
 
-    fun setup() {
+    init {
+        setup()
+    }
+
+    private fun setup() {
         val model = FileUtil.loadMappedFile(context, modelPath)
         val options = Interpreter.Options()
         options.numThreads = 4

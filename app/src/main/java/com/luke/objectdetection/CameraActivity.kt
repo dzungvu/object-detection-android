@@ -56,8 +56,7 @@ class CameraActivity : AppCompatActivity(), Detector.DetectorListener {
         }
 
 
-        detector = Detector(baseContext, MODEL_PATH, LABELS_PATH, this)
-        detector.setup()
+        detector = Detector(baseContext, this)
 
         if (allPermissionsGranted()) {
             startCamera()

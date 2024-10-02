@@ -25,9 +25,7 @@ class GalleryActivity : AppCompatActivity(), Detector.DetectorListener {
 
     //region detector
     private val detector: Detector by lazy {
-        Detector(this, MODEL_PATH, LABELS_PATH, this).apply {
-            setup()
-        }
+        Detector(this, this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
