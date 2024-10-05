@@ -59,7 +59,8 @@ dependencies {
 //    // Other dependencies
 //    implementation(libs.androidx.media3.exoplayer.hls)
 
-    implementation(project(":object-detection"))
+//    implementation(project(":object-detection"))
+    implementation(libs.objectt.detection)
 
     //region exoplayer 2
     implementation(libs.exoplayer)

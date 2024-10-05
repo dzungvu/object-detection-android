@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("maven-publish")
 }
 
 android {
@@ -23,12 +24,50 @@ android {
             )
         }
     }
+
+    publishing {
+        singleVariant("release")
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            groupId = "com.luke.object_detection"
+            artifactId = "object-detection"
+            version = "1.0.2"
+
+            pom {
+                name.set("Object Detection")
+                description.set("Object Detection Library")
+                url.set("https://github.com/dzungvu/object-detection-android")
+
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "SmartShopObjectDetection"
+            url = uri("https://maven.pkg.github.com/dzungvu/object-detection-android")
+            credentials {
+                username = System.getenv("GITHUB_USER") ?: ""
+                password = System.getenv("GITHUB_TOKEN") ?: ""
+            }
+        }
     }
 }
 
