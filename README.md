@@ -22,7 +22,7 @@ implementation("com.luke.object_detection:object-detection:1.0.6")
 Init:</br></br>
 
 ```kotlin
-private val detector by lazy { Detector(baseContext, this) }
+private val detector by lazy { Detector(baseContext, this) } //this: Detector.DetectorListener
 ```
 
 Usage: </br> </br>
