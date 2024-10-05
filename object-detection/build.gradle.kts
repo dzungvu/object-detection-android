@@ -37,35 +37,54 @@ android {
     }
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("release") {
-            groupId = "com.luke.object_detection"
-            artifactId = "object-detection"
-            version = "1.0.2"
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
 
-            pom {
-                name.set("Object Detection")
-                description.set("Object Detection Library")
-                url.set("https://github.com/dzungvu/object-detection-android")
+                groupId = "com.luke.object_detection"
+                artifactId = "object-detection"
+                version = "1.0.6"
 
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                pom {
+                    name.set("Object Detection")
+                    description.set("Object Detection Library")
+                    url.set("https://github.com/dzungvu/object-detection-android")
+
+                    licenses {
+                        license {
+                            name.set("The Apache License, Version 2.0")
+                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id.set("dzungvu")
+                            name.set("Dzung Vu")
+                            email.set("dzungvucs@gmail.com") // Replace with your email
+                        }
+                    }
+
+                    scm {
+                        connection.set("scm:git:git://github.com/dzungvu/object-detection-android.git")
+                        developerConnection.set("scm:git:ssh://github.com/dzungvu/object-detection-android.git")
+                        url.set("https://github.com/dzungvu/object-detection-android")
                     }
                 }
+
             }
         }
-    }
 
-    repositories {
-        maven {
-            name = "SmartShopObjectDetection"
-            url = uri("https://maven.pkg.github.com/dzungvu/object-detection-android")
-            credentials {
-                username = System.getenv("GITHUB_USER") ?: ""
-                password = System.getenv("GITHUB_TOKEN") ?: ""
+        repositories {
+            maven {
+                name = "SmartShopObjectDetection"
+                url = uri("https://maven.pkg.github.com/dzungvu/object-detection-android")
+                credentials {
+                    username = System.getenv("GITHUB_USER") ?: ""
+                    password = System.getenv("GITHUB_TOKEN") ?: ""
+                }
             }
         }
     }

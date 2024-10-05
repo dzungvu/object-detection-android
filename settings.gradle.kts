@@ -1,3 +1,12 @@
+import java.util.Properties
+import java.io.File
+
+val localProperties = Properties()
+val localPropertiesFile = File(rootDir, "local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
+}
+
 pluginManagement {
     repositories {
         google {
@@ -19,8 +28,8 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://maven.pkg.github.com/dzungvu/object-detection-android")
             credentials {
-                username = System.getenv("GITHUB_USER") ?: ""
-                password = System.getenv("GITHUB_TOKEN") ?: ""
+                username = localProperties["artifactory_username"] as String
+                password = localProperties["artifactory_password"] as String
             }
         }
     }

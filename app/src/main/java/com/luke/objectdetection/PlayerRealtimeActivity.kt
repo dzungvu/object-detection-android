@@ -165,6 +165,7 @@ class PlayerRealtimeActivity : AppCompatActivity(), Detector.DetectorListener,
 
     override fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long) {
         runOnUiThread {
+            Log.d("PlayerRealtimeActivity", "onDetect: $boundingBoxes")
             binding.inferenceTime.text = "${inferenceTime}ms"
             binding.overlay.apply {
                 setResults(boundingBoxes)
