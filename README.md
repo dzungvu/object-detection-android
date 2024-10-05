@@ -25,6 +25,13 @@ Init:</br></br>
 private val detector by lazy { Detector(baseContext, this) }
 ```
 
+Usage: </br> </br>
+```kotlin
+detector.detectWithCoroutine(bitmap)
+//or
+detector.detect(bitmap)
+```
+
 <h2>DetectorListener:</h2>
 Example</br></br>
 
