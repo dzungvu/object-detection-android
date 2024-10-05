@@ -14,6 +14,10 @@ maven {
 ```
 For username and password please [contact](skype:live:thedung2709?chat) for information
 
+```gradle.kts
+implementation("com.luke.object_detection:object-detection:1.0.6")
+```
+
 
 Init:</br></br>
 
