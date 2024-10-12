@@ -19,7 +19,7 @@ private val okHttpClient = OkHttpClient.Builder()
     .build()
 
 object RetrofitClient {
-    private const val BASE_URL = "http://vinhhq.tech:33333/"
+    private const val BASE_URL = "http://vinhhq.tech:5000/"
 
     val instance: Retrofit by lazy {
         Retrofit.Builder()

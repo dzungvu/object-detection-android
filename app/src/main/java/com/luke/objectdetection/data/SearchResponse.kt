@@ -3,7 +3,7 @@ package com.luke.objectdetection.data
 import com.google.gson.annotations.SerializedName
 
 data class SearchResponse (
-    @SerializedName("results")
+    @SerializedName("data")
     val results: List<SearchItemResponse> = emptyList()
 ) {
     data class SearchItemResponse(
@@ -11,9 +11,9 @@ data class SearchResponse (
         val title: String = "",
         @SerializedName("price")
         val price: String = "",
-        @SerializedName("product_url")
+        @SerializedName("href_value")
         val prodUrl: String = "",
-        @SerializedName("image_url")
+        @SerializedName("img")
         val imgUrl: String = "",
     )
 }
