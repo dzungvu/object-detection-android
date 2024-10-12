@@ -14,11 +14,22 @@ maven {
 ```
 For username and password please [contact](skype:live:thedung2709?chat) for information
 
+```gradle.kts
+implementation("com.luke.object_detection:object-detection:1.0.6")
+```
+
 
 Init:</br></br>
 
 ```kotlin
-private val detector by lazy { Detector(baseContext, this) }
+private val detector by lazy { Detector(baseContext, this) } //this: Detector.DetectorListener
+```
+
+Usage: </br> </br>
+```kotlin
+detector.detectWithCoroutine(bitmap)
+//or
+detector.detect(bitmap)
 ```
 
 <h2>DetectorListener:</h2>
