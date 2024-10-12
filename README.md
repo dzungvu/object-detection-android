@@ -15,7 +15,7 @@ maven {
 For username and password please [contact](skype:live:thedung2709?chat) for information
 
 ```gradle.kts
-implementation("com.luke.object_detection:object-detection:1.0.6")
+implementation("com.luke.object_detection:object-detection:1.0.7")
 ```
 
 
@@ -53,3 +53,6 @@ override fun onDetect(boundingBoxes: List<BoundingBox>, inferenceTime: Long) {
     }
 }
 ```
+
+Change log:
+1.0.7: Update Overlay UI
