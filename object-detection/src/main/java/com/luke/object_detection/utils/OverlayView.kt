@@ -10,7 +10,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
-import com.luke.object_detection.R
+import java.util.Locale
 import kotlin.math.abs
 
 class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
@@ -49,6 +49,7 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
                 downY = event.y
                 downTime = System.currentTimeMillis()
             }
+
             MotionEvent.ACTION_UP -> {
                 val upX = event.x
                 val upY = event.y
@@ -68,42 +69,66 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     }
 
     private fun initPaints() {
-        textBackgroundPaint.color = Color.BLACK
+        textBackgroundPaint.color = Color.WHITE
         textBackgroundPaint.style = Paint.Style.FILL
-        textBackgroundPaint.textSize = 50f
+        textBackgroundPaint.textSize = 36f
 
-        textPaint.color = Color.WHITE
+        textPaint.color = Color.BLACK
         textPaint.style = Paint.Style.FILL
-        textPaint.textSize = 50f
+        textPaint.textSize = 36f
 
-        boxPaint.color = ContextCompat.getColor(context!!, R.color.bounding_box_color)
-        boxPaint.strokeWidth = 8F
+        boxPaint.color = ContextCompat.getColor(context!!, android.R.color.white)
+        boxPaint.strokeWidth = BACKGROUND_STROKE
         boxPaint.style = Paint.Style.STROKE
     }
 
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
 
-        results.forEach {
-            val left = it.x1 * width
-            val top = it.y1 * height
-            val right = it.x2 * width
-            val bottom = it.y2 * height
+        results.forEach { result ->
+            val left = result.x1 * width
+            val top = result.y1 * height
+            val right = result.x2 * width
+            val bottom = result.y2 * height
 
-            canvas.drawRect(left, top, right, bottom, boxPaint)
-            val drawableText = it.clsName
+            canvas.drawRoundRect(left, top, right, bottom, BOX_RADIUS, BOX_RADIUS, boxPaint)
+
+            val drawableText = result.clsName.replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(
+                    Locale.getDefault()
+                ) else it.toString()
+            }
 
             textBackgroundPaint.getTextBounds(drawableText, 0, drawableText.length, bounds)
             val textWidth = bounds.width()
             val textHeight = bounds.height()
-            canvas.drawRect(
-                left,
-                top,
-                left + textWidth + BOUNDING_RECT_TEXT_PADDING,
-                top + textHeight + BOUNDING_RECT_TEXT_PADDING,
-                textBackgroundPaint
-            )
-            canvas.drawText(drawableText, left, top + bounds.height(), textPaint)
+
+            val rectLeft = left - BACKGROUND_STROKE / 2
+            val rectTop = top - BACKGROUND_STROKE / 2
+            val rectRight = left + textWidth + BOUNDING_RECT_TEXT_PADDING
+            val rectBottom = top + textHeight + BOUNDING_RECT_TEXT_PADDING
+
+            val path = android.graphics.Path().apply {
+                moveTo(rectLeft, rectTop + BOX_RADIUS)
+                arcTo(rectLeft, rectTop, rectLeft + BOX_RADIUS, rectTop + BOX_RADIUS, 180f, 90f, false)
+                if(rectRight > right) {
+                    lineTo(rectRight - BOX_RADIUS, rectTop)
+                    arcTo(rectRight - BOX_RADIUS, rectTop, rectRight, rectTop + BOX_RADIUS, 270f, 90f, false)
+                } else {
+                    lineTo(rectRight, rectTop)
+                }
+                lineTo(rectRight, rectBottom - BOX_RADIUS)
+                arcTo(rectRight - BOX_RADIUS, rectBottom - BOX_RADIUS, rectRight, rectBottom, 0f, 90f, false)
+                lineTo(rectLeft, rectBottom)
+                lineTo(rectLeft, rectTop + BOX_RADIUS)
+                close()
+            }
+            canvas.drawPath(path, textBackgroundPaint)
+
+            val textX = rectLeft + (rectRight - rectLeft) / 2 - textWidth / 2
+            val textY = rectTop + (((rectBottom - rectTop) / 2) + (textHeight / 2)) - BIAS
+
+            canvas.drawText(drawableText, textX, textY, textPaint)
 
         }
     }
@@ -123,14 +148,14 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
             var selectedBox: BoundingBox? = null
             clickedBoxes.forEach { box ->
                 calculateWidthHeightOfSelectedBox(box).apply {
-                    if(boxWidth > first && boxHeight > second) {
+                    if (boxWidth > first && boxHeight > second) {
                         boxWidth = first
                         boxHeight = second
                         selectedBox = box
                     }
                 }
             }
-            if(selectedBox == null) selectedBox = clickedBoxes.last()
+            if (selectedBox == null) selectedBox = clickedBoxes.last()
             selectedBox?.let {
                 Log.d("OverlayView", "Clicked on ${it.clsName}")
                 onChooseBoxListener?.onChooseBox(it)
@@ -156,7 +181,10 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     }
 
     companion object {
-        private const val BOUNDING_RECT_TEXT_PADDING = 8
+        private const val BOX_RADIUS = 48f
+        private const val BOUNDING_RECT_TEXT_PADDING = 48f
+        private const val BIAS = 2f
+        private const val BACKGROUND_STROKE = 6f
     }
 
     interface OnChooseBoxListener {

@@ -45,7 +45,7 @@ afterEvaluate {
 
                 groupId = "com.luke.object_detection"
                 artifactId = "object-detection"
-                version = "1.0.6"
+                version = "1.0.7"
 
                 pom {
                     name.set("Object Detection")
